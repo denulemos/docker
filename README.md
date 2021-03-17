@@ -1,4 +1,10 @@
-# Docker 🚀️ 
+# Docker 🚀️
+
+* No se recomienda usar el Docker que viene por defecto con Ubuntu. Se debe instalar la mas actual.
+* Al instalar Docker en windows, se instala una imagen de Linux por detrás, ya que Windows no provee soporte nativo para Docker.
+* `docker images` => Ver la lista de imagenes
+* `docker run hello-world` => Se fija si posee la imagen hello-world, si no la tiene, la descarga y la ejecuta
+* Si tengo que usar `sudo` para cualquiera de los comandos, algo de la instalacion no esta bien.
 
 ### Arquitectura Microservicios
 
@@ -69,6 +75,6 @@
 * Almacenan las imagenes
 * Las versiones de una misma imagen se llaman tag. latest es un tag especial, representa a la ultima imagen.
 * Pueden ser privadas o publicas. DockerHub es la mas conocida y publica (que tambien brinda servicios privados).
-* Siempre deben tener un certificado asociado seguro.
+* Siempre deben tener un certificado asociado seguro. Si estoy experimentando de forma local, podemos correr sin certificado, pero en produccion no se puede.
 * Docker NO conecta con registrys inseguras.
 * Las registrys privadas necesitan un login previo, una autenticacion.
