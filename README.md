@@ -39,7 +39,7 @@
 * **Ligereza** => Las imagenes y los containers son cosas muy livianas.
 * **Autosuficiente** => Un contenedor solo tiene lo necesario, no mas ni menos.
 
-#### Docker vs Virtual Machine 👀️ 
+#### Docker vs Virtual Machine 👀️
 
 * **VM** provee una capa que es un mini SO que construye ambientes virtuales de Hardware, y sobre estos, instala el SO y recien ahi, pone la aplicacion a correr. La capa de Hypervisor es liviana, pero el resto es pesado en recursos.
 * **Docker** NO virtualiza hardware, virtualiza procesos. No tengo una VM corriendo, tengo un espacio de trabajo en el Kernel donde instancio las librerias/binarios que necesito para la aplicacion. Instalo las dependencias minimas que necesita la aplicacion para funcionar. Son procesos muy livianos.
@@ -78,3 +78,70 @@
 * Siempre deben tener un certificado asociado seguro. Si estoy experimentando de forma local, podemos correr sin certificado, pero en produccion no se puede.
 * Docker NO conecta con registrys inseguras.
 * Las registrys privadas necesitan un login previo, una autenticacion.
+
+# Ejecutando Containers
+
+#### Imagenes base
+
+Estan creadas desde scratch, y basadas en Linux usualmente (como debian, etc).
+OpenJDK, PHP, Ruby, y otros tambien entregan imagenes base. Estan albergadas en **dockerhub.io**
+
+#### Imagenes Parents
+
+Son las mas usadas, se crean desde una imagen base, y son de uso mas especifico, como Wordpress, Python con alguna herramienta especifica, etc..
+Tambien estan en dockerhub, pueden pesar mucho y tener muchas vulnerabilidades, ya que son mantenidas por la comunidad
+
+## Comandos 👀️ 
+
+Correr el container de apache:
+
+`docker run httpd:2.4`
+
+* Si no se tiene un container localmente, se va automaticamente a buscarla a dockerhub
+* Al hacerlo en consola, perdemos la consola, podemos ejecutar `docker run -td httpd:2.4` para correrlo a segundo plano y no perder la consola. Esto nos devolvera un hash solo.
+* `docker ps` => Listar los container en ejecucion
+* `docker stop (idContainer)` => Stoppear el container
+* `docker start (idContainer)` => Reiniciar container
+* `docker rm (idContainer)` => Borrar container, si esta corriendo no puedo borrarlo, a menos que corra `docker rm --force (idContainer)` para borrarlo a la fuerza
+* Docker genera los nombres de los container de manera random, los podemos nombrar nosotros mismos y referenciarnos a los mismos por eso y no por su ID `docker run -td --name (nombre) httpd:2.4`
+
+#### Acceder al container por localhost
+
+`docker run -td --name webserver -p8089:80 httpd:2.4`
+
+Y podemos acceder mediante `localhost://8089 `
+
+#### Comandos dentro del container en ejecucion
+
+Quiero ejecutar de forma interactiva en el container un comando (en este caso, ps -aux)
+
+`docker exec -ti webserver ps -aux`
+
+Nos va a dar error, entonces, instalamos lo necesario, updateamos e instalamos propcs
+
+`docker exec -ti webserver apt-get update; docker exec -ti webserver apt-get install -y procps`
+
+Ahora si podremos correr el primer comando y ver los procesos dentro del container.
+
+Si quiero ver cuanto esta usando el container de mis recursos, RAM, etc..
+
+`docker stats (nombreContainer)`
+
+Sin el nombre del container, va a traer de todos los containers en ejecucion.
+
+Puedo limitar la cantidad de cores que puede usar mi container
+
+`docker run -td --cpus 2 8089:80 --name webserver httpd:2.4`
+
+Existen comandos para consumir mucha CPU nuestra, hasta el punto de asesinar a nuestro propio equipo, o que el container muera ya que el CPU ya no puede responder como debe.
+
+Limitar memoria a 400 megas
+
+`docker run -td --cpus 2 --memory 400m -p 8089:80 --name webserver httpd:2.4`
+
+El container seguira viendo la misma cantidad de memoria RAM que antes, la total disponible, pero solo estará limitado a 400m
+
+Si quiero **ver los logs de mi container**
+
+`docker logs webserver`
+
